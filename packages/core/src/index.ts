@@ -117,6 +117,7 @@ export {
 } from './extensions/plugin'
 export { defineText } from './extensions/text'
 export { defineFacet, type Facet } from './facets/facet'
+export { rootFacet, type RootOutput, type RootPayload } from './facets/root'
 export { defineFacetPayload } from './facets/facet-extension'
 export type { AnyAttrs, AttrSpec } from './types/attrs'
 export type { BaseNodeViewOptions } from './types/base-node-view-options'

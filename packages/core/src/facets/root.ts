@@ -6,14 +6,14 @@ import type { CommandCreators } from '../types/extension-command'
 
 import { Facet } from './facet'
 
-export type RootPayload = {
+export interface RootPayload {
   schema?: Schema | null
   commands?: CommandCreators
   state?: (ctx: { schema: Schema }) => EditorStateConfig
   view?: Omit<DirectEditorProps, 'state'>
 }
 
-export type RootOutput = {
+export interface RootOutput {
   schema?: Schema | null
   commands?: CommandCreators
   state?: EditorStateConfig
