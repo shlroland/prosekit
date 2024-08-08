@@ -4,10 +4,35 @@ import {
   getNodeType,
   insertNode,
   type Extension,
+  type FindParentNodeResult,
 } from '@prosekit/core'
-import type { ProseMirrorNode, Schema } from '@prosekit/pm/model'
+import {
+  type ProseMirrorNode,
+  type ResolvedPos,
+  type Schema,
+} from '@prosekit/pm/model'
 import { TextSelection, type Command } from '@prosekit/pm/state'
-import type { TableRole } from 'prosemirror-tables'
+import {
+  addColumnAfter,
+  addColumnBefore,
+  addRowAfter,
+  addRowBefore,
+  CellSelection,
+  deleteColumn,
+  deleteRow,
+  deleteTable,
+  mergeCells,
+  pointsAtCell,
+  splitCell,
+  TableMap,
+  type TableRole,
+} from 'prosemirror-tables'
+
+import {
+  columnFirstCellPos,
+  isCellSelection,
+  rowFirstCellPos,
+} from './table-utils'
 
 function createEmptyTable(
   schema: Schema,
@@ -56,8 +81,9 @@ export interface InsertTableOptions {
  *
  * @public
  */
-export function insertTable({ row, col, header }: InsertTableOptions): Command {
+export function insertTable(options: InsertTableOptions): Command {
   return (state, dispatch, view) => {
+    const { row, col, header } = options
     const table = createEmptyTable(state.schema, row, col, header)
     return insertNode({ node: table })(state, dispatch, view)
   }
@@ -108,6 +134,125 @@ export const exitTable: Command = (state, dispatch) => {
   return true
 }
 
+export function clearTableCellContent(cellPos?: ResolvedPos | number): Command {
+  return (state, dispatch) => {
+    let { tr } = state
+
+    if (cellPos) {
+      const $pos =
+        typeof cellPos === 'number' ? tr.doc.resolve(cellPos) : cellPos
+      if (!pointsAtCell($pos)) return false
+
+      const pos = $pos.pos
+      const node = tr.doc.nodeAt(pos)
+      if (!node) return false
+
+      const copyNode = node.type.createAndFill(node.attrs)
+
+      if (copyNode) {
+        dispatch?.(tr.replaceWith(pos, pos + node.nodeSize, copyNode))
+        return true
+      }
+    }
+
+    const { selection } = state
+    if (isCellSelection(selection)) {
+      selection.forEachCell((cellNode, pos) => {
+        const copyNode = cellNode.type.createAndFill(cellNode.attrs)
+        pos = tr.mapping.map(pos)
+        if (copyNode) {
+          tr = tr.replaceWith(pos, pos + cellNode.nodeSize, copyNode)
+        }
+      })
+      dispatch?.(tr)
+      return true
+    }
+
+    return false
+  }
+}
+
+/**
+ * @public
+ */
+export interface SelectColumnOptions {
+  colIndex: number
+  table: Pick<FindParentNodeResult, 'pos' | 'node'>
+}
+
+/**
+ * @public
+ */
+export function selectColumn(options: SelectColumnOptions): Command {
+  return (state, dispatch) => {
+    const { table, colIndex } = options
+    const pos = columnFirstCellPos(table.node, table.pos, colIndex)
+    let { tr } = state
+    const $pos = tr.doc.resolve(pos)
+    const selection = CellSelection.colSelection($pos)
+    tr = tr.setSelection(selection)
+    dispatch?.(tr)
+
+    return true
+  }
+}
+
+/**
+ * @public
+ */
+export interface SelectRowOptions {
+  rowIndex: number
+  table: Pick<FindParentNodeResult, 'pos' | 'node'>
+}
+
+/**
+ * @public
+ */
+export function selectRow(options: SelectRowOptions): Command {
+  return (state, dispatch) => {
+    const { table, rowIndex } = options
+    const pos = rowFirstCellPos(table.node, table.pos, rowIndex)
+    let { tr } = state
+    const $pos = tr.doc.resolve(pos)
+    const selection = CellSelection.colSelection($pos)
+    tr = tr.setSelection(selection)
+    dispatch?.(tr)
+
+    return true
+  }
+}
+
+/**
+ * @public
+ */
+export interface SelectTableOptions {
+  table: Pick<FindParentNodeResult, 'pos' | 'node'>
+}
+
+/**
+ * @public
+ */
+export function selectTable(options: SelectTableOptions): Command {
+  return (state, dispatch) => {
+    const { table } = options
+    const map = TableMap.get(table.node)
+    if (map.map.length > 0) {
+      let tr = state.tr
+      const firstCellPosInTable = map.map[0]!
+      const lastCellPosInTable = map.map[map.map.length - 1]!
+      const firstCellPos = table.pos + firstCellPosInTable + 1
+      const lastCellPos = table.pos + lastCellPosInTable + 1
+      const $firstCellPos = tr.doc.resolve(firstCellPos)
+      const $lastCellPos = tr.doc.resolve(lastCellPos)
+      const selection = new CellSelection($firstCellPos, $lastCellPos)
+      tr = tr.setSelection(selection)
+      dispatch?.(tr)
+      return true
+    }
+    return false
+  }
+}
+
 /**
  * @internal
  */
@@ -115,6 +260,19 @@ export type TableCommandsExtension = Extension<{
   Commands: {
     insertTable: [InsertTableOptions]
     exitTable: []
+    clearTableCellContent: [cellPos?: ResolvedPos | number]
+    mergeTableCells: []
+    splitTableCell: []
+    selectColumn: [SelectColumnOptions]
+    selectRow: [SelectRowOptions]
+    selectTable: [SelectTableOptions]
+    deleteTableColumn: []
+    addTableColumnBefore: []
+    addTableColumnAfter: []
+    addTableRowAbove: []
+    addTableRowBelow: []
+    deleteTableRow: []
+    deleteTable: []
   }
 }>
 
@@ -127,5 +285,18 @@ export function defineTableCommands(): TableCommandsExtension {
   return defineCommands({
     insertTable,
     exitTable: () => exitTable,
+    clearTableCellContent,
+    mergeTableCells: () => mergeCells,
+    splitTableCell: () => splitCell,
+    selectColumn,
+    selectRow,
+    selectTable,
+    deleteTableColumn: () => deleteColumn,
+    addTableColumnBefore: () => addColumnBefore,
+    addTableColumnAfter: () => addColumnAfter,
+    addTableRowAbove: () => addRowBefore,
+    addTableRowBelow: () => addRowAfter,
+    deleteTableRow: () => deleteRow,
+    deleteTable: () => deleteTable,
   })
 }

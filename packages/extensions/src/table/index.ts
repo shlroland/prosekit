@@ -56,3 +56,19 @@ export {
   type TableRowSpecExtension,
   type TableSpecExtension,
 }
+
+export {
+  insertTable,
+  type InsertTableOptions,
+  exitTable,
+  clearTableCellContent,
+  selectColumn,
+  type SelectColumnOptions,
+  selectRow,
+  type SelectRowOptions,
+  selectTable,
+  type SelectTableOptions,
+} from './table-commands'
+
+export * from './table-utils'
+export * from 'prosemirror-tables'
