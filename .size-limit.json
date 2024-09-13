@@ -411,35 +411,67 @@
   },
   {
     "name": "prosekit/lit",
-    "path": "packages/prosekit/dist/prosekit-lit.js"
+    "path": "packages/prosekit/dist/prosekit-lit.js",
+    "ignore": [
+      "@lit/context",
+      "lit"
+    ]
   },
   {
     "name": "prosekit/lit/autocomplete",
-    "path": "packages/prosekit/dist/prosekit-lit-autocomplete.js"
+    "path": "packages/prosekit/dist/prosekit-lit-autocomplete.js",
+    "ignore": [
+      "@lit/context",
+      "lit"
+    ]
   },
   {
     "name": "prosekit/lit/block-handle",
-    "path": "packages/prosekit/dist/prosekit-lit-block-handle.js"
+    "path": "packages/prosekit/dist/prosekit-lit-block-handle.js",
+    "ignore": [
+      "@lit/context",
+      "lit"
+    ]
   },
   {
     "name": "prosekit/lit/inline-popover",
-    "path": "packages/prosekit/dist/prosekit-lit-inline-popover.js"
+    "path": "packages/prosekit/dist/prosekit-lit-inline-popover.js",
+    "ignore": [
+      "@lit/context",
+      "lit"
+    ]
   },
   {
     "name": "prosekit/lit/popover",
-    "path": "packages/prosekit/dist/prosekit-lit-popover.js"
+    "path": "packages/prosekit/dist/prosekit-lit-popover.js",
+    "ignore": [
+      "@lit/context",
+      "lit"
+    ]
   },
   {
     "name": "prosekit/lit/resizable",
-    "path": "packages/prosekit/dist/prosekit-lit-resizable.js"
+    "path": "packages/prosekit/dist/prosekit-lit-resizable.js",
+    "ignore": [
+      "@lit/context",
+      "lit"
+    ]
   },
   {
     "name": "prosekit/lit/table-handle",
-    "path": "packages/prosekit/dist/prosekit-lit-table-handle.js"
+    "path": "packages/prosekit/dist/prosekit-lit-table-handle.js",
+    "ignore": [
+      "@lit/context",
+      "lit"
+    ]
   },
   {
     "name": "prosekit/lit/tooltip",
-    "path": "packages/prosekit/dist/prosekit-lit-tooltip.js"
+    "path": "packages/prosekit/dist/prosekit-lit-tooltip.js",
+    "ignore": [
+      "@lit/context",
+      "lit"
+    ]
   },
   {
     "name": "prosekit/pm",

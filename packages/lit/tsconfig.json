@@ -3,6 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "temp",
+    "experimentalDecorators": true,
   },
   "include": ["./src", "./*.js", "./*.ts"],
 }
