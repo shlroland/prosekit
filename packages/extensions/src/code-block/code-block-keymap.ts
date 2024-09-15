@@ -6,7 +6,7 @@ import { TextSelection, type Command } from '@prosekit/pm/state'
  */
 export function defineCodeBlockKeymap() {
   return defineKeymap({
-    Enter: existCodeBlock,
+    Enter: exitCodeBlock,
   })
 }
 
@@ -14,7 +14,7 @@ export function defineCodeBlockKeymap() {
  * Exit a code block and insert a default block below if the cursor is at the
  * end of the code block and the code block is ended with two new lines.
  */
-const existCodeBlock: Command = (state, dispatch) => {
+const exitCodeBlock: Command = (state, dispatch) => {
   if (!state.selection.empty) {
     return false
   }
