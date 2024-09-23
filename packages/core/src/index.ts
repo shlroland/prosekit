@@ -217,3 +217,4 @@ export {
 } from './utils/type-assertion'
 export * from './utils/unicode'
 export { withSkipCodeBlock } from './utils/with-skip-code-block'
+export { defineDecoration } from './extensions/decoration'

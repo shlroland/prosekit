@@ -18,26 +18,25 @@ export function defineDecoration(payload: DecorationPayload): PlainExtension {
 }
 
 const decorationFacet = defineFacet<DecorationPayload, PluginPayload>({
-  reduce: () => {
-    let initialDecorationSet = DecorationSet.empty
-    return (inputs) => {
-      const decorationPlugin = new ProseMirrorPlugin({
-        key: new PluginKey('prosekit-decoration'),
-        props: {
-          decorations: (state) => {
-            for (const input of inputs) {
-              const decorationSet = input(state)
-              initialDecorationSet = initialDecorationSet.add(
-                state.doc,
-                decorationSet.find(),
-              )
-            }
-            return initialDecorationSet
-          },
+  reducer: (inputs) => {
+    const decorationPlugin = new ProseMirrorPlugin({
+      key: new PluginKey('prosekit-decoration'),
+      props: {
+        decorations: (state) => {
+          let initialDecorationSet = DecorationSet.empty
+
+          for (const input of inputs) {
+            const decorationSet = input(state)
+            initialDecorationSet = initialDecorationSet.add(
+              state.doc,
+              decorationSet.find(),
+            )
+          }
+          return initialDecorationSet
         },
-      })
-      return decorationPlugin
-    }
+      },
+    })
+    return decorationPlugin
   },
   parent: pluginFacet,
 })

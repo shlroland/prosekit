@@ -13,6 +13,7 @@ import {
 } from 'prosekit/react'
 
 import CodeBlockView from './code-block-view'
+import { defineHeadingAnchor } from './heading-anchor'
 
 export function defineExtension() {
   return union(
@@ -27,6 +28,7 @@ export function defineExtension() {
       component: CodeBlockView as ReactNodeViewComponent,
     }),
     defineHorizontalRule(),
+    defineHeadingAnchor(),
   )
 }
 
